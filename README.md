@@ -1,28 +1,43 @@
 # DailyHub - Dashboard SPA
 
-Bienvenue sur **DailyHub**, une application "Single Page" interactive conçue en JavaScript pur (Vanilla), sans aucun framework. Ce dashboard centralise toutes vos informations quotidiennes dans une interface premium et responsive.
+Une Single Page Application (SPA) ultra-moderne conçue comme un tableau de bord personnel. Architecture "No-Backend", tout est géré côté client avec Vite et hébergé en production sous Docker/Nginx.
 
-## 🚀 Fonctionnalités
+## 🚀 Fonctionnalités Actuelles
 
-### Flux Temps Réel (APIs)
-- **Météo Expert** : Température, humidité et vent en temps réel.
-- **Matchs de Foot** : Scores et affiches du jour.
-- **Infos Bourse** : Suivi des bourse mondiales.
-- **News Feed** : Derniers titres de l'actualité.
+- **Météo Dynamique** : Température en temps réel et prévisions avec recherche de ville (OpenWeather API).
+- **Scores de Foot en Direct** : Suivi des ligues européennes majeures avec traduction du statut et timer écoulé (API-Sports).
+- **Marchés Financiers** : Ticker des bourses majeures en temps réel (Finnhub API).
+- **Sur le Web (News)** : Actualités en direct filtrées (NewsAPI).
+- **Gestionnaire de Tâches** : "To-do list" épurée avec sauvegarde automatique.
+- **Radio / Player** : Lecteur YouTube invisible intégré pour diffuser de la musique (YouTube Iframe API).
+- **Horloge Magistrale** : Horloge tickant à la seconde, avec date complète.
+- **Mode Télécommande** : Bouton natif pour passer le tableau de bord en plein-écran.
 
-### Outils & Utilitaires
-- **Suivi de Colis** : Barre de progression dynamique.
-- **Calculatrice** : Opérations mathématiques intégrées.
-- **Horloge & Calendrier** : Temps réel avec les secondes et calendrier du mois.
+## 📋 Critères Techniques du Projet JS (Parfaitement Respectés)
 
-### Gestion & Personnalisation
-- **Task Manager (Post-it)** : Ajoutez, barrez et supprimez vos tâches.
-- **Player Musique** : Contrôles audio (Play/Pause/Volume) via YouTube IFrame API.
-- **Dark Mode** : Changez de thème en un clic.
+1. **Manipulation du DOM** : `index.html` est totalement vide. **100% de l'interface** est générée à la volée en JavaScript via une usine à composants (`document.createElement`).
+2. **Événements** : Utilisation intensive des listeners (`click` sur les tâches, `keypress` "Entrée" sur les inputs météo/tâches).
+3. **Persistance des Données** : Utilisation stricte de l'API `localStorage` pour conserver définitivement la dernière ville météo et la liste complète des tâches après rafraîchissement.
+4. **Pure JS Sécurisé** : Approche asynchrone pointue (`async/await`, `Promise.all`), filtrage réseau complexe (`.filter()`, `.map()`, `.forEach()`) pour parser divers JSON.
+5. **Design Moderne (Bento Box)** : CSS avancé avec utilisation de l'architecture `Grid areas` pour garantir un viewport de `100vh`/`100vw` ultra-propre et sans scroll intempestif.
 
-## 📋 Critères Techniques Respectés
-- **Manipulation du DOM** : 0 élément dynamique codé en dur dans le HTML. Tout est généré via `document.createElement`.
-- **Événements** : Click, Change, Input.
-- **Persistance** : Utilisation du `LocalStorage` pour le thème et les tâches.
-- **Pure JS** : Utilisation intensive de `.forEach()`, `.map()` et `.filter()`.
-- **Design** : CSS Grid Layout, Responsive design, Glassmorphism.
+## 🛠️ Architecture & Déploiement
+
+Le projet est segmenté en deux espaces stricts (Clean Architecture) :
+- `frontend/` : Contient l'application pure.
+- `/` (Racine) : Contient l'infrastructure système.
+
+### Installation Locale
+```bash
+# 1. Configurer vos clés API dans le fichier caché .env à la racine
+# 2. Entrer dans le code de l'application
+cd frontend
+# 3. Installer et lancer
+npm install
+npm run dev
+```
+
+### Déploiement Production (VPS / Coolify)
+Le projet contient un `Dockerfile` multi-stage :
+- Étape 1 : Builder Node Alpine (Compile le projet).
+- Étape 2 : Nginx Alpine (Expose le dossier statique avec le fichier `nginx.conf`).
