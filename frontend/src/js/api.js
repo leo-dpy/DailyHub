@@ -21,7 +21,7 @@ export const fetchNews = async () => {
   try {
     // Broadened the search to just grab general french news to guarantee results
     const targetUrl = `https://newsapi.org/v2/top-headlines?language=fr&apiKey=${token}`;
-    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
+    const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
     
     const res = await fetch(proxyUrl);
     if(!res.ok) throw new Error('News API error');
@@ -30,7 +30,7 @@ export const fetchNews = async () => {
     
     // Fallback if top-headlines fails
     const backupUrl = `https://newsapi.org/v2/everything?q=tech&language=fr&apiKey=${token}`;
-    const backupRes = await fetch(`https://corsproxy.io/?${encodeURIComponent(backupUrl)}`);
+    const backupRes = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(backupUrl)}`);
     const backupData = await backupRes.json();
     return backupData.articles ? backupData.articles.slice(0, 8) : [];
   } catch (e) {
@@ -61,9 +61,9 @@ export const fetchFootball = async () => {
   try {
     const today = new Date().toISOString().split('T')[0];
     const targetUrl = `https://v3.football.api-sports.io/fixtures?date=${today}`;
-    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
     
-    const res = await fetch(proxyUrl, {
+    // Bypass corsproxy as api-sports supports CORS natively and the proxy strips custom authentication headers
+    const res = await fetch(targetUrl, {
       headers: {
         'x-apisports-key': token
       }
