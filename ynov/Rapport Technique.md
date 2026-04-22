@@ -69,4 +69,5 @@ Même si le projet est prévu pour un déploiement robuste en production via Doc
 3. Lancez la version de développement avec `npm run dev`.
 4. L'application est disponible directement dans le navigateur et se mettra à jour en fonction des inputs.
 
-*Ce dossier `ynov` comporte ainsi ce rapport, le sujet d'origine (PDF), justifiant de la complétude du développement face aux attentes pédagogiques.*
+*Ce dossier `ynov` comporte ainsi ce rapport, le sujet d'origine (PDF), justifiant chaque attentes pédagogiques.*
+
