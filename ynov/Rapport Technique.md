@@ -12,7 +12,7 @@ Ce document justifie de la bonne implémentation des prérequis techniques du "P
 DailyHub est un tableau de bord complet qui regroupe plusieurs widgets interactifs, mis à jour dynamiquement au sein d'une même page :
 
 - **Widget Météo (OpenWeather API) :** Affiche la température, l'humidité et les icônes selon la ville recherchée.
-- **Scores Sportifs (API-Sports) :** Suivi en direct ou statut des matchs des ligues européennes majeures.
+- **Scores Sportifs (ESPN API) :** Suivi en direct ou statut des matchs des ligues européennes majeures (sans clé).
 - **Flux d'Actualités (NewsAPI) :** Remontée des derniers gros titres.
 - **Marchés Financiers (Finnhub API) :** Suivi en temps réel des actions/bourses majeures.
 - **Gestionnaire de Tâches (Post-it / To-do) :** Permet d'ajouter, valider et supprimer des tâches.

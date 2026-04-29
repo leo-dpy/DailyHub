@@ -13,7 +13,7 @@
 ## 🚀 Fonctionnalités Clés
 
 - **Météo Dynamique** : Température en temps réel et prévisions avec recherche de ville (OpenWeather API). *Mémoire locale active.*
-- **Scores de Foot en Direct** : Suivi des ligues européennes majeures avec traduction du statut et timer écoulé (API-Sports).
+- **Scores de Foot en Direct** : Suivi des ligues européennes majeures avec traduction du statut et timer écoulé (ESPN API, sans clé requise).
 - **Marchés Financiers** : Ticker des bourses majeures en temps réel (Finnhub API).
 - **Sur le Web (News)** : Actualités en direct filtrées, présentées subtilement (NewsAPI).
 - **Gestionnaire de Tâches** : "To-do list" épurée avec sauvegarde automatique et persistante (appuyez sur "Entrée" pour interagir).
