@@ -56,27 +56,20 @@ export const fetchFinance = async (symbols = ['AAPL', 'MSFT', 'TSLA']) => {
 };
 
 export const fetchFootball = async () => {
-  const token = getEnv('FOOTBALL_API_KEY');
-  if(!token) return [];
   try {
-    const today = new Date().toISOString().split('T')[0];
-    const targetUrl = `https://v3.football.api-sports.io/fixtures?date=${today}`;
-    
-    // Bypass corsproxy as api-sports supports CORS natively and the proxy strips custom authentication headers
-    const res = await fetch(targetUrl, {
-      headers: {
-        'x-apisports-key': token
+    const leagues = ['eng.1', 'esp.1', 'ita.1', 'fra.1', 'ger.1', 'uefa.champions'];
+    const results = await Promise.all(leagues.map(async (league) => {
+      try {
+        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/scoreboard`);
+        const data = await res.json();
+        return data.events || [];
+      } catch(e) {
+        return [];
       }
-    });
+    }));
     
-    const data = await res.json();
-    if (!data.response) return [];
-
-    // Top Leagues IDs: 39 (PL), 140 (La Liga), 135 (Serie A), 61 (Ligue 1), 78 (Bundesliga), 2 (UCL), 3 (UEL)
-    const majorLeagues = [39, 140, 135, 61, 78, 2, 3];
-    const filtered = data.response.filter(m => m.league && majorLeagues.includes(m.league.id));
-    
-    return filtered.slice(0, 7);
+    const allMatches = results.flat();
+    return allMatches.slice(0, 7);
   } catch (e) {
     console.error("Football API:", e);
     return [];

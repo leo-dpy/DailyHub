@@ -155,30 +155,35 @@ const buildFootball = () => {
   panel.appendChild(list);
 
   fetchFootball().then(matches => {
-    if(matches.length === 0) list.appendChild(el('p', '', 'Pas de match pour aujourd\'hui.'));
+    if(matches.length === 0) {
+      list.appendChild(el('p', '', 'Pas de match pour aujourd\'hui.'));
+      return;
+    }
+    
     matches.forEach(m => {
       const row = el('div', 'football-item'); 
-      const hName = m.teams?.home?.name || 'Home';
-      const aName = m.teams?.away?.name || 'Away';
-      // api-football goals might be null before match starts
-      const hScore = m.goals?.home !== null ? m.goals.home : '-';
-      const aScore = m.goals?.away !== null ? m.goals.away : '-';
       
-      const st = m.fixture?.status?.short;
-      const elapsed = m.fixture?.status?.elapsed;
+      const comp0 = m.competitions[0].competitors[0];
+      const comp1 = m.competitions[0].competitors[1];
+      
+      const homeTeam = comp0.homeAway === 'home' ? comp0 : comp1;
+      const awayTeam = comp0.homeAway === 'away' ? comp0 : comp1;
+
+      const hName = homeTeam.team.shortDisplayName || homeTeam.team.name || 'Home';
+      const aName = awayTeam.team.shortDisplayName || awayTeam.team.name || 'Away';
+      
+      const hScore = homeTeam.score || '0';
+      const aScore = awayTeam.score || '0';
+      
+      const state = m.status.type.state; // 'pre', 'in', 'post'
       let statusStr = '';
-      if (['FT', 'AET', 'PEN'].includes(st)) {
+      if (state === 'post') {
         statusStr = 'Terminé';
-      } else if (st === 'HT') {
-        statusStr = 'Mi-temps';
-      } else if (['1H', '2H', 'ET', 'P', 'LIVE'].includes(st)) {
-        statusStr = elapsed ? `${elapsed}'` : 'En cours';
-      } else if (['PST', 'CANC', 'ABD'].includes(st)) {
-        statusStr = 'Annulé/Reporté';
-      } else if (st === 'NS' || st === 'TBD') {
-        statusStr = new Date(m.fixture.date).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+      } else if (state === 'in') {
+        statusStr = m.status.displayClock || 'En cours';
       } else {
-        statusStr = st;
+        // pre match
+        statusStr = new Date(m.date).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
       }
       
       const statusDiv = el('div', 'football-status', statusStr);
@@ -188,7 +193,10 @@ const buildFootball = () => {
       homeSpan.style.flex = '1';
       homeSpan.style.textAlign = 'right';
       
-      const scoreSpan = el('span', 'score-badge', `${hScore} - ${aScore}`);
+      const displayHScore = state === 'pre' ? '-' : hScore;
+      const displayAScore = state === 'pre' ? '-' : aScore;
+
+      const scoreSpan = el('span', 'score-badge', `${displayHScore} - ${displayAScore}`);
       scoreSpan.style.padding = '0 1rem';
       scoreSpan.style.fontWeight = '700';
       scoreSpan.style.color = 'var(--text-main)';
