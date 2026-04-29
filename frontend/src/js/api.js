@@ -57,10 +57,16 @@ export const fetchFinance = async (symbols = ['AAPL', 'MSFT', 'TSLA']) => {
 
 export const fetchFootball = async () => {
   try {
-    const leagues = ['eng.1', 'esp.1', 'ita.1', 'fra.1', 'ger.1', 'uefa.champions'];
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const dateStr = `${yyyy}${mm}${dd}`;
+
+    const leagues = ['eng.1', 'esp.1', 'ita.1', 'fra.1', 'ger.1', 'uefa.champions', 'uefa.europa'];
     const results = await Promise.all(leagues.map(async (league) => {
       try {
-        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/scoreboard`);
+        const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/scoreboard?dates=${dateStr}`);
         const data = await res.json();
         return data.events || [];
       } catch(e) {
