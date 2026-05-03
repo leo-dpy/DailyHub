@@ -1,46 +1,46 @@
 import { fetchWeather, fetchNews, fetchFinance, fetchFootball } from './api.js';
 import { el, appendChildren } from './dom.js';
 
-// Elements state
+// État global
 let tasks = JSON.parse(localStorage.getItem('dailyhub_tasks') || '[]');
 let currentTheme = localStorage.getItem('dailyhub_theme') || 'dark';
 
-// DOM Setup
+// Initialisation du DOM
 document.documentElement.setAttribute('data-theme', currentTheme);
 const app = document.getElementById('app');
 
-// Build UI Layout
+// Construction de l'interface
 const buildHeader = () => {
   const header = el('div', 'bento-box header-widget');
-  
-  // LEFT: Weather
+
+  // GAUCHE : Météo
   const weatherDiv = el('div', 'weather-widget');
   const weatherIcon = el('div', 'weather-icon', '🌍');
   const wInfo = el('div', 'weather-info');
   const wTitle = el('div', 'weather-temp', 'Chargement...');
-  
-  const wInputContainer = el('div', 'weather-input-container'); 
+
+  const wInputContainer = el('form', 'weather-input-container');
   const cityInput = el('input');
   cityInput.placeholder = "Ville...";
   const cityBtn = el('button', '', '📍');
   appendChildren(wInputContainer, [cityInput, cityBtn]);
-  
+
   appendChildren(wInfo, [wTitle, wInputContainer]);
   appendChildren(weatherDiv, [weatherIcon, wInfo]);
 
-  // CENTER: Clock & Date
+  // CENTRE : Horloge & Date
   const centerDiv = el('div', 'header-center');
   const clockDiv = el('div', 'clock-main', '00:00:00');
   const dateDiv = el('div', 'date-main', 'Lundi...');
   appendChildren(centerDiv, [clockDiv, dateDiv]);
 
-  // RIGHT: Logo & Actions
+  // DROITE : Logo & Actions
   const rightDiv = el('div', 'header-right');
-  
+
   const fsBtn = el('button', 'fullscreen-btn', '⛶');
   fsBtn.addEventListener('click', () => {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
+      document.documentElement.requestFullscreen().catch(() => { });
       fsBtn.innerHTML = '✖';
     } else {
       document.exitFullscreen();
@@ -61,21 +61,20 @@ const buildHeader = () => {
     dateDiv.textContent = now.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   }, 1000);
 
-  // Handle weather fetch
   const getIcon = (code) => {
-    if(code.includes('01')) return '☀️';
-    if(code.includes('02')) return '⛅';
-    if(code.includes('03') || code.includes('04')) return '☁️';
-    if(code.includes('09') || code.includes('10')) return '🌧️';
-    if(code.includes('11')) return '⛈️';
-    if(code.includes('13')) return '❄️';
+    if (code.includes('01')) return '☀️';
+    if (code.includes('02')) return '⛅';
+    if (code.includes('03') || code.includes('04')) return '☁️';
+    if (code.includes('09') || code.includes('10')) return '🌧️';
+    if (code.includes('11')) return '⛈️';
+    if (code.includes('13')) return '❄️';
     return '🌍';
   };
 
   const updateWeather = (city) => {
     wTitle.textContent = `${city}...`;
     fetchWeather(city).then(data => {
-      if(data) {
+      if (data) {
         wTitle.textContent = `${data.main.temp.toFixed(1)}°C`;
         weatherIcon.textContent = getIcon(data.weather[0].icon);
         localStorage.setItem('dailyhub_city', data.name);
@@ -88,15 +87,12 @@ const buildHeader = () => {
   let currentCity = localStorage.getItem('dailyhub_city') || 'Paris';
   updateWeather(currentCity);
 
-  cityBtn.addEventListener('click', () => {
-    if(cityInput.value.trim()) {
+  wInputContainer.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (cityInput.value.trim()) {
       updateWeather(cityInput.value.trim());
       cityInput.value = '';
     }
-  });
-
-  cityInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') cityBtn.click();
   });
 
   return header;
@@ -109,11 +105,11 @@ const buildNews = () => {
   panel.appendChild(list);
 
   fetchNews().then(articles => {
-    if(articles.length === 0) list.appendChild(el('p', '', 'Aucune news trouvée.'));
+    if (articles.length === 0) list.appendChild(el('p', '', 'Aucune news trouvée.'));
     articles.forEach(article => {
       const item = el('div', 'news-item');
       const link = el('a', '', article.title);
-      if(article.url) {
+      if (article.url) {
         link.href = article.url;
         link.target = "_blank";
       }
@@ -133,12 +129,12 @@ const buildFinance = () => {
 
   const defaultSyms = ['AAPL', 'MSFT', 'GOOGL', 'AMZN'];
   fetchFinance(defaultSyms).then(stocks => {
-    if(stocks.length === 0) ticker.appendChild(el('p', '', 'Données inaccessibles.'));
+    if (stocks.length === 0) ticker.appendChild(el('p', '', 'Données inaccessibles.'));
     stocks.forEach(stock => {
       const sDiv = el('div', 'stock-item');
       const sym = el('div', '', stock.symbol);
       const diff = stock.current - stock.previous;
-      const sVal = el('div', diff >= 0 ? 'stock-positive' : 'stock-negative', 
+      const sVal = el('div', diff >= 0 ? 'stock-positive' : 'stock-negative',
         `$${stock.current.toFixed(2)} (${diff > 0 ? '+' : ''}${diff.toFixed(2)})`);
       appendChildren(sDiv, [sym, sVal]);
       ticker.appendChild(sDiv);
@@ -155,44 +151,44 @@ const buildFootball = () => {
   panel.appendChild(list);
 
   fetchFootball().then(matches => {
-    if(matches.length === 0) {
+    if (matches.length === 0) {
       list.appendChild(el('p', '', 'Pas de match pour aujourd\'hui.'));
       return;
     }
-    
+
     matches.forEach(m => {
-      const row = el('div', 'football-item'); 
-      
+      const row = el('div', 'football-item');
+
       const comp0 = m.competitions[0].competitors[0];
       const comp1 = m.competitions[0].competitors[1];
-      
+
       const homeTeam = comp0.homeAway === 'home' ? comp0 : comp1;
       const awayTeam = comp0.homeAway === 'away' ? comp0 : comp1;
 
       const hName = homeTeam.team.shortDisplayName || homeTeam.team.name || 'Home';
       const aName = awayTeam.team.shortDisplayName || awayTeam.team.name || 'Away';
-      
+
       const hScore = homeTeam.score || '0';
       const aScore = awayTeam.score || '0';
-      
-      const state = m.status.type.state; // 'pre', 'in', 'post'
+
+      const state = m.status.type.state;
       let statusStr = '';
       if (state === 'post') {
         statusStr = 'Terminé';
       } else if (state === 'in') {
         statusStr = m.status.displayClock || 'En cours';
       } else {
-        // pre match
-        statusStr = new Date(m.date).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+        // Match à venir
+        statusStr = new Date(m.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
       }
-      
+
       const statusDiv = el('div', 'football-status', statusStr);
       const detailsDiv = el('div', 'football-details');
-      
+
       const homeSpan = el('span', 'team-name', hName);
       homeSpan.style.flex = '1';
       homeSpan.style.textAlign = 'right';
-      
+
       const displayHScore = state === 'pre' ? '-' : hScore;
       const displayAScore = state === 'pre' ? '-' : aScore;
 
@@ -200,7 +196,7 @@ const buildFootball = () => {
       scoreSpan.style.padding = '0 1rem';
       scoreSpan.style.fontWeight = '700';
       scoreSpan.style.color = 'var(--text-main)';
-      
+
       const awaySpan = el('span', 'team-name', aName);
       awaySpan.style.flex = '1';
       awaySpan.style.textAlign = 'left';
@@ -233,7 +229,7 @@ const buildTaskManager = () => {
     tasks.forEach((t, i) => {
       const li = el('li', t.done ? 'task-item completed' : 'task-item');
       const txt = el('span', '', t.text);
-      
+
       const del = el('button', 'delete-btn', 'X');
       del.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -257,13 +253,12 @@ const buildTaskManager = () => {
   };
 
   btn.addEventListener('click', () => {
-    if(!input.value.trim()) return;
+    if (!input.value.trim()) return;
     tasks.push({ text: input.value, done: false });
     input.value = '';
     saveRender();
   });
-  
-  // Also add on enter key
+
   input.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
       btn.click();
@@ -277,7 +272,7 @@ const buildTaskManager = () => {
 const buildMusic = () => {
   const panel = el('div', 'bento-box grid-music');
   panel.appendChild(el('h3', '', 'Radio'));
-  
+
   const ytInputCont = el('div', 'task-input-container');
   ytInputCont.style.marginBottom = "0.5rem";
   const ytInput = el('input');
@@ -285,10 +280,10 @@ const buildMusic = () => {
   const loadBtn = el('button', '', 'Charger');
   appendChildren(ytInputCont, [ytInput, loadBtn]);
   panel.appendChild(ytInputCont);
-  
+
   const ytContainer = el('div');
   ytContainer.id = "yt-player";
-  ytContainer.style.display = "none"; 
+  ytContainer.style.display = "none";
   panel.appendChild(ytContainer);
 
   const controls = el('div', 'task-input-container');
@@ -299,13 +294,13 @@ const buildMusic = () => {
   appendChildren(controls, [playBtn, stopBtn]);
   panel.appendChild(controls);
 
-  // Setup Youtube Iframe API natively
+  // Configuration de l'API YouTube Iframe
   let player;
-  let currentVideoId = 'jfKfPfyJRdk'; // default lofi
-  
+  let currentVideoId = 'jfKfPfyJRdk'; // Vidéo lofi par défaut
+
   window.onYouTubeIframeAPIReady = () => {
     player = new YT.Player('yt-player', {
-      height: '0', 
+      height: '0',
       width: '0',
       videoId: currentVideoId,
       playerVars: { 'autoplay': 0, 'controls': 0 },
@@ -315,49 +310,49 @@ const buildMusic = () => {
   const tag = document.createElement('script');
   tag.src = "https://www.youtube.com/iframe_api";
   const firstScriptTag = document.getElementsByTagName('script')[0];
-  if(firstScriptTag) firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  if (firstScriptTag) firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   else document.head.appendChild(tag);
 
   const extractVideoID = (url) => {
     const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
     const match = url.match(regExp);
-    return (match&&match[7].length==11)? match[7] : false;
+    return (match && match[7].length == 11) ? match[7] : false;
   };
 
   loadBtn.addEventListener('click', () => {
     let val = ytInput.value.trim();
-    if(!val) return;
+    if (!val) return;
     const extracted = extractVideoID(val);
     const finalId = extracted ? extracted : val;
-    if(player && player.loadVideoById) {
+    if (player && player.loadVideoById) {
       player.loadVideoById(finalId);
       ytInput.value = '';
       ytInput.placeholder = "Musique chargée !";
-      playBtn.style.opacity = '0.5'; 
+      playBtn.style.opacity = '0.5';
       stopBtn.style.opacity = '1';
     }
   });
 
-  playBtn.addEventListener('click', () => { 
-    if(player && player.playVideo) {
+  playBtn.addEventListener('click', () => {
+    if (player && player.playVideo) {
       player.playVideo();
-      playBtn.style.opacity = '0.5'; 
-      stopBtn.style.opacity = '1'; 
+      playBtn.style.opacity = '0.5';
+      stopBtn.style.opacity = '1';
     }
   });
 
-  stopBtn.addEventListener('click', () => { 
-    if(player && player.pauseVideo) {
+  stopBtn.addEventListener('click', () => {
+    if (player && player.pauseVideo) {
       player.pauseVideo();
-      stopBtn.style.opacity = '0.5'; 
-      playBtn.style.opacity = '1'; 
+      stopBtn.style.opacity = '0.5';
+      playBtn.style.opacity = '1';
     }
   });
 
   return panel;
 };
 
-// Assembly
+// Assemblage final
 const initApp = () => {
   app.innerHTML = '';
   const header = buildHeader();

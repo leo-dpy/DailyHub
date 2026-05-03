@@ -4,10 +4,10 @@ export const getEnv = (key) => {
 
 export const fetchWeather = async (city = 'Paris') => {
   const token = getEnv('WEATHER_API_KEY');
-  if(!token) return null;
+  if (!token) return null;
   try {
     const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${token}&units=metric&lang=fr`);
-    if(!res.ok) throw new Error('Weather API limit/error');
+    if (!res.ok) throw new Error('Weather API limit/error');
     return await res.json();
   } catch (e) {
     console.error(e);
@@ -17,18 +17,18 @@ export const fetchWeather = async (city = 'Paris') => {
 
 export const fetchNews = async () => {
   const token = getEnv('NEWS_API_KEY');
-  if(!token) return [];
+  if (!token) return [];
   try {
-    // Broadened the search to just grab general french news to guarantee results
+    // Recherche élargie aux actus générales françaises pour garantir des résultats
     const targetUrl = `https://newsapi.org/v2/top-headlines?language=fr&apiKey=${token}`;
     const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`;
-    
+
     const res = await fetch(proxyUrl);
-    if(!res.ok) throw new Error('News API error');
+    if (!res.ok) throw new Error('News API error');
     const data = await res.json();
     if (data.articles && data.articles.length > 0) return data.articles.slice(0, 8);
-    
-    // Fallback if top-headlines fails
+
+    // Solution de repli si top-headlines échoue
     const backupUrl = `https://newsapi.org/v2/everything?q=tech&language=fr&apiKey=${token}`;
     const backupRes = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(backupUrl)}`);
     const backupData = await backupRes.json();
@@ -41,7 +41,7 @@ export const fetchNews = async () => {
 
 export const fetchFinance = async (symbols = ['AAPL', 'MSFT', 'TSLA']) => {
   const token = getEnv('FINANCE_API_KEY');
-  if(!token) return [];
+  if (!token) return [];
   try {
     const results = await Promise.all(symbols.map(async sym => {
       const res = await fetch(`https://finnhub.io/api/v1/quote?symbol=${sym}&token=${token}`);
@@ -69,11 +69,11 @@ export const fetchFootball = async () => {
         const res = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/scoreboard?dates=${dateStr}`);
         const data = await res.json();
         return data.events || [];
-      } catch(e) {
+      } catch (e) {
         return [];
       }
     }));
-    
+
     const allMatches = results.flat();
     return allMatches.slice(0, 7);
   } catch (e) {
