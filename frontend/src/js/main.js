@@ -319,13 +319,26 @@ const buildMusic = () => {
     return (match && match[7].length == 11) ? match[7] : false;
   };
 
+  const extractPlaylistID = (url) => {
+    const regExp = /[?&]list=([^#&?]+)/;
+    const match = url.match(regExp);
+    return match ? match[1] : false;
+  };
+
   loadBtn.addEventListener('click', () => {
     let val = ytInput.value.trim();
     if (!val) return;
-    const extracted = extractVideoID(val);
-    const finalId = extracted ? extracted : val;
-    if (player && player.loadVideoById) {
-      player.loadVideoById(finalId);
+
+    const playlistId = extractPlaylistID(val);
+    const videoId = extractVideoID(val);
+
+    if (player) {
+      if (playlistId) {
+        player.loadPlaylist({ list: playlistId, listType: 'playlist' });
+      } else {
+        const finalId = videoId ? videoId : val;
+        player.loadVideoById(finalId);
+      }
       ytInput.value = '';
       ytInput.placeholder = "Musique chargée !";
       playBtn.style.opacity = '0.5';
