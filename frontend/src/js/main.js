@@ -38,20 +38,32 @@ const buildHeader = () => {
   const rightDiv = el('div', 'header-right');
 
   const fsBtn = el('button', 'fullscreen-btn', '⛶');
-  fsBtn.addEventListener('click', () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => { });
-      fsBtn.innerHTML = '✖';
-    } else {
-      document.exitFullscreen();
-      fsBtn.innerHTML = '⛶';
+  fsBtn.addEventListener('click', async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+        fsBtn.textContent = '✖';
+      } else {
+        await document.exitFullscreen();
+        fsBtn.textContent = '⛶';
+      }
+    } catch (err) {
+      console.error(`Erreur plein écran: ${err.message}`);
     }
+  });
+
+  const themeBtn = el('button', 'theme-btn', currentTheme === 'dark' ? '☀️' : '🌙');
+  themeBtn.addEventListener('click', () => {
+    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    localStorage.setItem('dailyhub_theme', currentTheme);
+    themeBtn.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
   });
 
   const logoDiv = el('div');
   logoDiv.innerHTML = '<span class="logo-bold">Daily</span>Hub';
 
-  appendChildren(rightDiv, [fsBtn, logoDiv]);
+  appendChildren(rightDiv, [themeBtn, fsBtn, logoDiv]);
 
   appendChildren(header, [weatherDiv, centerDiv, rightDiv]);
 

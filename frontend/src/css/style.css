@@ -20,6 +20,15 @@
   --bento-radius: 20px;
 }
 
+:root {
+  --bg-main: var(--bg-main-dark);
+  --bento-bg: var(--bento-bg-dark);
+  --bento-border: var(--bento-border-dark);
+  --text-main: var(--text-main-dark);
+  --text-muted: var(--text-muted-dark);
+  --accent: var(--accent-dark);
+}
+
 [data-theme="dark"] {
   --bg-main: var(--bg-main-dark);
   --bento-bg: var(--bento-bg-dark);
@@ -29,8 +38,7 @@
   --accent: var(--accent-dark);
 }
 
-[data-theme="light"],
-:root {
+[data-theme="light"] {
   --bg-main: var(--bg-main-light);
   --bento-bg: var(--bento-bg-light);
   --bento-border: var(--bento-border-light);
@@ -188,8 +196,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 1rem;
-  width: 33%;
+  gap: 1.2rem;
+  width: 35%;
 }
 
 .logo-bold {
@@ -213,8 +221,28 @@ body {
   align-items: center;
 }
 
-.fullscreen-btn:hover {
+.fullscreen-btn:hover,
+.theme-btn:hover {
   background: var(--bento-border);
+}
+
+.theme-btn {
+  background: transparent;
+  border: 1px solid var(--bento-border);
+  color: var(--text-main);
+  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.theme-btn:hover {
+  transform: scale(1.05);
 }
 
 /* Zones de la grille utilisées en JS */
@@ -278,9 +306,9 @@ h3 {
 /* Champs de saisie (Météo, Tâches, Radio) */
 .task-input-container {
   display: flex;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
-  gap: 0.5rem;
+  margin-bottom: 1.2rem;
+  gap: 0.6rem;
+  align-items: stretch;
 }
 
 .task-input-container input {
